@@ -7,6 +7,11 @@ const messageContentInput = document.getElementById("message-content");
 
 let userName = "";
 
+const socket = io();
+socket.on("message", ({ author, content }) => addMessage(author, content));
+socket.on("newUser", ({ author, content }) => addMessage(author, content));
+socket.on("userLeft", ({ author, content }) => addMessage(author, content));
+
 const login = (event) => {
   event.preventDefault();
   if (userNameInput.value !== "") {
@@ -17,13 +22,14 @@ const login = (event) => {
   } else {
     alert("this field cannot be empty");
   }
+  socket.emit("login", userName);
 };
 const sendMessage = (event) => {
   event.preventDefault();
   if (messageContentInput.value) {
     addMessage(userName, messageContentInput.value);
+    socket.emit("message", { author: userName, content: messageContentInput.value });
     messageContentInput.value = "";
-    alert("this field cannot be empty");
   } else {
     alert("this field cannot be empty");
   }
@@ -32,7 +38,12 @@ function addMessage(author, content) {
   const message = document.createElement("li");
   message.classList.add("message");
   message.classList.add("message--received");
-  if (author === userName) message.classList.add("message--self");
+  if (author === userName) {
+    message.classList.add("message--self");
+  }
+  if (author === "ChatBot") {
+    message.classList.add("message--chatBot");
+  }
   message.innerHTML = `
      <h3 class="message__author">${userName === author ? "You" : author}</h3>
      <div class="message__content">

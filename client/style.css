@@ -108,6 +108,10 @@
    display: block;
  }
 
+ .message--chatBot {
+  font-style: italic;
+}
+
  @-webkit-keyframes fadeIn {
    from {
      opacity: 0;
